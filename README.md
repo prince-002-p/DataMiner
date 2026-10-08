@@ -35,3 +35,16 @@ backend/       API, models, services and security
 frontend/      React/Vite application
 adapters/      Source-specific collection adapters
 parsers/       Data parsing components
+
+## Version Status
+
+### V1.0.0 — Frozen Baseline
+
+DataMiner V1.0.0 established the initial full-stack scraping platform, including authentication, job management, Selenium-based collection, database persistence, exports, logging, and frontend integration.
+
+The original source website used during V1 development has since undergone significant structural changes. Therefore, V1 is preserved as a historical baseline rather than continuing to tightly couple the core application to a changing third-party source.
+
+### V2 — Next Development Phase
+
+V2 will focus on a more maintainable adapter-based scraping architecture, source-change resilience, improved extraction validation, and clearer handling of no-data and scraper-failure conditions.
+
