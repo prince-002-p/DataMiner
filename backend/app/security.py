@@ -10,7 +10,10 @@ from .database import get_db
 from .models import User
 
 # Configuration for JWT
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "schoolminer_super_secret_key_v5.0")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+
+if not SECRET_KEY:
+    raise RuntimeError("JWT_SECRET_KEY environment variable is required.")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 300  # Long duration for dashboard usage
 

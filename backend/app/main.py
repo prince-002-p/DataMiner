@@ -25,33 +25,48 @@ from .services.scraper_worker import (
 app = FastAPI(title="SchoolMiner Enterprise v5.0 API")
 
 # Configure CORS for React local development
+cors_origins = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:5173"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins for local networking simplicity
+    allow_origins=[origin.strip() for origin in cors_origins if origin.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Create Database Tables
 Base.metadata.create_all(bind=engine)
 
-# Create Default Admin User
-db = SessionLocal = engine.raw_connection()
-# Initialize default admin if not present
+# Optional initial admin creation through environment variables.
+# No default credentials are created automatically.
 def init_admin():
+    initial_username = os.getenv("INITIAL_ADMIN_USERNAME")
+    initial_password = os.getenv("INITIAL_ADMIN_PASSWORD")
+
+    if not initial_username or not initial_password:
+        return
+
     db = next(get_db())
-    admin_user = db.query(User).filter(User.username == "admin").first()
-    if not admin_user:
-        hashed = get_password_hash("admin123")
-        admin = User(username="admin", hashed_password=hashed, role="admin")
-        db.add(admin)
-        db.commit()
-        print("★ Created default admin account: admin / admin123")
-    db.close()
+    try:
+        admin_user = db.query(User).filter(User.username == initial_username).first()
+
+        if not admin_user:
+            hashed = get_password_hash(initial_password)
+            admin = User(
+                username=initial_username,
+                hashed_password=hashed,
+                role="admin"
+            )
+            db.add(admin)
+            db.commit()
+            print(f"Initial admin account created: {initial_username}")
+    finally:
+        db.close()
 
 init_admin()
-
 # Memory cache for district lists to optimize loading speeds
 DISTRICTS_CACHE = {}
 
